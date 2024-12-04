@@ -23,6 +23,33 @@ public class ParkingManager {
         return parkingLots;
     }
 
+    public Ticket park(String strategy, String plateNumber) {
+        ParkingBoy selectedParkingBoy;
+        switch (strategy) {
+            case "SequentiallyStrategy":
+                selectedParkingBoy = parkingBoys.get(0);
+                break;
+            case "MaxAvailableStrategy":
+                selectedParkingBoy = parkingBoys.get(1);
+                break;
+            case "AvailableRateStrategy":
+                selectedParkingBoy = parkingBoys.get(2);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown strategy: " + strategy);
+        }
+        Car car = new Car(plateNumber);
+        return selectedParkingBoy.park(car);
+    }
+
+    public Car fetch(String plateNumber) {
+        Ticket ticket = parkingLots.stream()
+                .flatMap(parkingLot -> parkingLot.getTickets().stream())
+                .filter(t -> t.plateNumber().equals(plateNumber))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found for plate number: " + plateNumber));
+        return parkingBoys.get(0).fetch(ticket);
+    }
 
 
 }

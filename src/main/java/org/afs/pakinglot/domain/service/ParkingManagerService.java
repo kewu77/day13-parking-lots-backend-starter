@@ -1,32 +1,28 @@
-package org.afs.pakinglot.domain;
+package org.afs.pakinglot.domain.service;
 
-import org.afs.pakinglot.domain.strategies.AvailableRateStrategy;
-import org.afs.pakinglot.domain.strategies.MaxAvailableStrategy;
-import org.afs.pakinglot.domain.strategies.SequentiallyStrategy;
+import org.afs.pakinglot.domain.Car;
+import org.afs.pakinglot.domain.ParkingBoy;
+import org.afs.pakinglot.domain.ParkingLot;
+import org.afs.pakinglot.domain.Ticket;
+import org.afs.pakinglot.domain.repository.ParkingManagerRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ParkingManager {
+@Service
+public class ParkingManagerService {
     public static final Pattern PLATE_NUMBER_PATTERN = Pattern.compile("[A-Z]{2}-\\d{4}");
 
+    private final ParkingManagerRepository repository;
 
-    private final List<ParkingLot> parkingLots = List.of(
-            new ParkingLot(1, "The Plaza Park", 9),
-            new ParkingLot(2, "City Mall Garage", 12),
-            new ParkingLot(3, "Office Tower Parking", 9)
-    );
-
-    private final List<ParkingBoy> parkingBoys = List.of(
-            new ParkingBoy(parkingLots, new SequentiallyStrategy()),
-            new ParkingBoy(parkingLots, new MaxAvailableStrategy()),
-            new ParkingBoy(parkingLots, new AvailableRateStrategy())
-    );
-
-    public List<ParkingLot> getAllParkingLots() {
-        return parkingLots;
+    public ParkingManagerService(ParkingManagerRepository repository) {
+        this.repository = repository;
     }
 
+    public List<ParkingLot> getAllParkingLots() {
+        return repository.getAllParkingLots();
+    }
 
     public Ticket park(String strategy, String plateNumber) {
         if (!PLATE_NUMBER_PATTERN.matcher(plateNumber).matches()) {
@@ -35,13 +31,13 @@ public class ParkingManager {
         ParkingBoy selectedParkingBoy;
         switch (strategy) {
             case "SequentiallyStrategy":
-                selectedParkingBoy = parkingBoys.get(0);
+                selectedParkingBoy = repository.getParkingBoys().get(0);
                 break;
             case "MaxAvailableStrategy":
-                selectedParkingBoy = parkingBoys.get(1);
+                selectedParkingBoy = repository.getParkingBoys().get(1);
                 break;
             case "AvailableRateStrategy":
-                selectedParkingBoy = parkingBoys.get(2);
+                selectedParkingBoy = repository.getParkingBoys().get(2);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown strategy: " + strategy);
@@ -51,13 +47,11 @@ public class ParkingManager {
     }
 
     public Car fetch(String plateNumber) {
-        Ticket ticket = parkingLots.stream()
+        Ticket ticket = repository.getAllParkingLots().stream()
                 .flatMap(parkingLot -> parkingLot.getTickets().stream())
                 .filter(everyTicket -> everyTicket.plateNumber().equals(plateNumber))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Ticket not found for plate number: " + plateNumber));
-        return parkingBoys.get(0).fetch(ticket);
+        return repository.getParkingBoys().get(0).fetch(ticket);
     }
-
-
 }

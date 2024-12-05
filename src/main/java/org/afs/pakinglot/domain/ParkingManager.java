@@ -5,8 +5,12 @@ import org.afs.pakinglot.domain.strategies.MaxAvailableStrategy;
 import org.afs.pakinglot.domain.strategies.SequentiallyStrategy;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ParkingManager {
+    public static final Pattern PLATE_NUMBER_PATTERN = Pattern.compile("[A-Z]{2}-\\d{4}");
+
+
     private final List<ParkingLot> parkingLots = List.of(
             new ParkingLot(1, "The Plaza Park", 9),
             new ParkingLot(2, "City Mall Garage", 12),
@@ -23,7 +27,11 @@ public class ParkingManager {
         return parkingLots;
     }
 
+
     public Ticket park(String strategy, String plateNumber) {
+        if (!PLATE_NUMBER_PATTERN.matcher(plateNumber).matches()) {
+            throw new IllegalArgumentException("Invalid plate number format: " + plateNumber);
+        }
         ParkingBoy selectedParkingBoy;
         switch (strategy) {
             case "SequentiallyStrategy":

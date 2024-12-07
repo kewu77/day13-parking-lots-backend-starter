@@ -13,6 +13,6 @@ public class ParkingLotMapper {
         List<TicketResponseDTO> tickets = parkingLot.getTickets().stream()
                 .map(ticket -> new TicketResponseDTO(ticket.plateNumber(), ticket.position(), ticket.parkingLot()))
                 .collect(Collectors.toList());
-        return new ParkingLotResponseDTO(parkingLot.getId(), parkingLot.getName(), tickets);
+        return new ParkingLotResponseDTO(parkingLot.getId(), parkingLot.getName(), tickets,parkingLot.getCapacity());
     }
 }

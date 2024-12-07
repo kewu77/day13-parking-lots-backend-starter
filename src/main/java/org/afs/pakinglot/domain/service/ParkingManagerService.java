@@ -40,13 +40,13 @@ public class ParkingManagerService {
         }
         ParkingBoy selectedParkingBoy;
         switch (strategy) {
-            case "SequentiallyStrategy":
+            case "Standard":
                 selectedParkingBoy = repository.getParkingBoys().get(0);
                 break;
-            case "MaxAvailableStrategy":
+            case "Smart":
                 selectedParkingBoy = repository.getParkingBoys().get(1);
                 break;
-            case "AvailableRateStrategy":
+            case "SuperSmart":
                 selectedParkingBoy = repository.getParkingBoys().get(2);
                 break;
             default:

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/parking")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ParkingManagerController {
 
     private final ParkingManagerService service;
